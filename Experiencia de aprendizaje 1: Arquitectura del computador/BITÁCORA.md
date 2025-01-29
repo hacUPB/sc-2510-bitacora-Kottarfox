@@ -97,4 +97,131 @@ D = D + M
 @var3
 M = D
 ```
+- Este programa suma lo que está en @var1 con @var2 y lo que es el resultado se queda guardado en @var3.
+- @var1, @var2 y @var3 tendrían que estar delante del 16 para que se pueda hacer alguna operación.
 
+10. Las posiciones de memoria RAM de 0 a 15 tienen los nombres simbólico R0 a R15. Escribe un programa en lenguaje ensamblador que guarde en R1 la operación 2 * R0.
+```
+@R0    
+D=M   
+@R1   
+D=D+D  
+M=D
+```
+
+18. Lo que dibujé:
+    ![image](https://github.com/user-attachments/assets/9fe61cdd-de32-4e2f-b2c1-2f4b2e313046)
+
+- El código:
+```
+  @SCREEN
+	D=A
+	@R12
+	AD=D+M
+	M=0
+	D=A 
+	@32
+	AD=D+A
+	M=0
+	D=A 
+	@32
+	AD=D+A
+	@248 
+	D=D+A 
+	A=D-A 
+	M=D-A 
+	D=A 
+	@32
+	AD=D+A
+	@13060 
+	D=D+A 
+	A=D-A 
+	M=D-A 
+	D=A 
+	@32
+	AD=D+A
+	@11278 
+	D=D+A 
+	A=D-A 
+	M=D-A 
+	D=A 
+	@32
+	AD=D+A
+	@8216 
+	D=D+A 
+	A=D-A 
+	M=D-A 
+	D=A 
+	@32
+	AD=D+A
+	@4484 
+	D=D+A 
+	A=D-A 
+	M=D-A 
+	D=A 
+	@32
+	AD=D+A
+	@8770 
+	D=D+A 
+	A=D-A 
+	M=D-A 
+	D=A 
+	@32
+	AD=D+A
+	@13473 
+	D=D+A 
+	A=D-A 
+	M=D-A 
+	D=A 
+	@32
+	AD=D+A
+	@11439 
+	D=D+A 
+	A=D-A 
+	M=D-A 
+	D=A 
+	@32
+	AD=D+A
+	@10408 
+	D=D+A 
+	A=D-A 
+	M=D-A 
+	D=A 
+	@32
+	AD=D+A
+	@4166 
+	D=D+A 
+	A=D-A 
+	M=D-A 
+	D=A 
+	@32
+	AD=D+A
+	@8194 
+	D=D+A 
+	A=D-A 
+	M=D-A 
+	D=A 
+	@32
+	AD=D+A
+	@6154 
+	D=D+A 
+	A=D-A 
+	M=D-A 
+	D=A 
+	@32
+	AD=D+A
+	@2038 
+	D=D+A 
+	A=D-A 
+	M=D-A 
+	D=A 
+	@32
+	AD=D+A
+	@2 
+	D=D+A 
+	A=D-A 
+	M=D-A 
+	@R13
+	A=M
+	D;JMP
+```
