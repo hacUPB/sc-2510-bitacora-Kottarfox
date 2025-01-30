@@ -1,4 +1,5 @@
 # Investigación
+> [!IMPORTANT]
 > [Página](https://confusion-snapper-025.notion.site/Experiencia-de-aprendizaje-1-Arquitectura-del-computador-17ee8161b2a180dab569d52e21dfeade) de la unidad.
 
 ### Actividad 1
@@ -10,7 +11,8 @@
 2. ¿Qué es un lenguaje ensamblador?: Es un lenguaje también conocido como Assembly, que es considerado como programación de bajo nivel. Se usa en instrucciones básicas a nivel de hardware.
 3. ¿Qué es lenguaje de máquina?: El lenguaje de máquina es el conjunto de instrucciones que una computadora puede entender y ejecutar directamente sin necesidad de ningún proceso intermedio. Es el nivel más bajo de programación y se compone de secuencias de bits (0s y 1s) que representan operaciones específicas para el procesador de la computadora.
 
-### Actividad 3
+### Actividad 3 <font color="blue">Este texto debería ser azul.</font>
+
 1. ¿Qué son PC, D y A?:
    - PC: Contador de Programa.
    - D: Registro de datos.
@@ -100,6 +102,43 @@ M = D
 - Este programa suma lo que está en @var1 con @var2 y lo que es el resultado se queda guardado en @var3.
 - @var1, @var2 y @var3 tendrían que estar delante del 16 para que se pueda hacer alguna operación.
 
+9. Considera el siguiente programa:
+```
+// i = 1
+@i
+M=1
+// sum = 0
+@sum
+M=0
+// sum = sum + i
+@i
+D=M
+@sum
+M=D+M
+// i = i + 1
+@i
+D=M+1
+@i
+M=D
+```
+- ¿Qué hace este programa?: Es una suma que sigue en ciclo de seguir aumentando i.
+- ¿En qué parte de la memoria RAM está la variable i y sum? ¿Por qué en esas posiciones?: Tendrían que estar de la posición @16 en adelante, por que son los espacios de la memoria que el programa assembly destina para estas operaciones, no se pueden usar de 15 para abajo ya que ese es espacio destinado al funcionamiento de la máquina.
+
+Optimiza esta parte del código para que use solo dos instrucciones:
+```
+// i = i + 1
+@i
+D=M+1
+@i
+M=D
+```
+
+- El código optimizado:
+```
+@i
+M=M+1
+```
+
 10. Las posiciones de memoria RAM de 0 a 15 tienen los nombres simbólico R0 a R15. Escribe un programa en lenguaje ensamblador que guarde en R1 la operación 2 * R0.
 ```
 @R0    
@@ -107,6 +146,83 @@ D=M
 @R1   
 D=D+D  
 M=D
+```
+
+11. Considera el siguiente programa:
+
+```
+// i = 1000
+@1000
+D=A
+@i
+M=D
+(LOOP)
+// if (i == 0) goto CONT
+@i
+D=M
+@CONT
+D;JEQ
+// i = i - 1
+@i
+M=M-1
+// goto LOOP
+@LOOP
+0;JMP
+(CONT)
+```
+
+- ¿Qué hace este programa?: Es una resta en bucle.
+- ¿En qué memoria está almacenada la variable i? ¿En qué dirección de esa memoria? En cualquier parte de la ram después del 16.
+- ¿En qué memoria y en qué dirección de memoria está almacenado el comentario //`i = 1000?`: Como es un comentario no estaría ocupando espacio alguno en la memoria.
+- ¿Cuál es la primera instrucción del programa anterior? ¿En qué memoria y en qué dirección de memoria está almacenada esa instrucción?: La primera instrucción sería el @1000 y estaría en 0 para dar comienzo al programa.
+- ¿Qué son CONT y LOOP?:
+  - CONT: este sería lo que marcaría el final del bucle, si es @CONT hace un salto hacia CONT.
+  - LOOP: y este es el que inicia el bucle, si es @LOOP sería lo que marca el salto hacia la etiqueta de LOOP.
+- ¿Cuál es la diferencia entre los símbolos `i` y `CONT`?:
+  - i es una variable.
+  - CONT es una etiqueta, siendo la que marca el final del loop.
+
+12. Implemente en ensamblador:
+```
+R4 = R1 + R2 + 69
+```
+
+- El código en Assembly:
+```
+    @1
+    D=M
+    @2
+    D=D+M
+    @69
+    D=D+A
+    @4
+    M=D
+```
+
+
+13. Implemente en ensamblador:
+```
+if R0 >= 0 then R1 = 1
+else R1 = –1
+
+(LOOP)
+goto LOOP
+```
+
+
+14. Implementa en ensamblador:
+```
+R4 = RAM[R1]
+```
+
+- El código en Assembly:
+
+```
+    @1
+    A=M
+    D=M
+    @4
+    M=D
 ```
 
 18. Lo que dibujé:
