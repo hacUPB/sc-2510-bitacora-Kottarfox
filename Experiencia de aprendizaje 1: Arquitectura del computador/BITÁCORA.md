@@ -11,8 +11,7 @@
 2. ¿Qué es un lenguaje ensamblador?: Es un lenguaje también conocido como Assembly, que es considerado como programación de bajo nivel. Se usa en instrucciones básicas a nivel de hardware.
 3. ¿Qué es lenguaje de máquina?: El lenguaje de máquina es el conjunto de instrucciones que una computadora puede entender y ejecutar directamente sin necesidad de ningún proceso intermedio. Es el nivel más bajo de programación y se compone de secuencias de bits (0s y 1s) que representan operaciones específicas para el procesador de la computadora.
 
-### Actividad 3 <font color="blue">Este texto debería ser azul.</font>
-
+### Actividad 3 
 1. ¿Qué son PC, D y A?:
    - PC: Contador de Programa.
    - D: Registro de datos.
@@ -225,6 +224,94 @@ R4 = RAM[R1]
     M=D
 ```
 
+15. Implementa en ensamblador el siguiente problema. En la posición R0 está almacenada la dirección inicial de una región de memoria. En la posición R1 está almacenado el tamaño de la región de memoria. Almacena un -1 en esa región de memoria.
+   - El problema en assembly:
+```
+    @R0
+    D=M
+    @R2
+    M=0
+    @R2
+    D=M
+    @R1
+    D=D-A
+    @end_loop
+    D;JEQ
+    @R0
+    D=M
+    @R2
+    A=D+A
+    D=-1
+    M=D
+    @R2
+    M=M+1
+    @loop
+    0;JMP
+```
+
+16. Implementa en lenguaje ensamblador el siguiente programa:
+```
+int[] arr = new int[10];
+int sum = 0;
+for (int j = 0; j < 10; j++) {
+    sum = sum + arr[j];
+}
+```
+
+- El código en ensamblador:
+```
+@0
+M=0
+@1
+M=0
+@2
+M=0
+@3
+M=0
+@4
+M=0
+@5
+M=0
+@6
+M=0
+@7
+M=0
+@8
+M=0
+@9
+M=0
+@sum
+M=0
+@j
+M=0
+(LOOP)
+@j
+D=M
+@10
+D=D-A
+@END
+D;JGE
+@j
+D=M
+@arr
+A=D+A
+D=M
+@sum
+M=M+D
+@j
+M=M+1
+@LOOP
+0;JMP
+(END)
+```
+
+- ¿Qué hace este programa?: Es una suma de diez elementos que se guarda en @sum.
+- ¿Cuál es la dirección base de arr en la memoria RAM?: Comienza en @0.
+- ¿Cuál es la dirección base de sum en la memoria RAM y por qué?: 
+- ¿Cuál es la dirección base de j en la memoria RAM y por qué?
+
+
+
 18. Lo que dibujé:
     ![image](https://github.com/user-attachments/assets/9fe61cdd-de32-4e2f-b2c1-2f4b2e313046)
 
@@ -341,3 +428,44 @@ R4 = RAM[R1]
 	A=M
 	D;JMP
 ```
+
+19. Analiza el siguiente programa en lenguaje de máquina:
+```
+0100000000000000
+1110110000010000
+0000000000010000
+1110001100001000
+0110000000000000
+1111110000010000
+0000000000010011
+1110001100000101
+0000000000010000
+1111110000010000
+0100000000000000
+1110010011010000
+0000000000000100
+1110001100000110
+0000000000010000
+1111110010101000
+1110101010001000
+0000000000000100
+1110101010000111
+0000000000010000
+1111110000010000
+0110000000000000
+1110010011010000
+0000000000000100
+1110001100000011
+0000000000010000
+1111110000100000
+1110111010001000
+0000000000010000
+1111110111001000
+0000000000000100
+1110101010000111
+```
+- ¿Qué hace este programa?: Parece ser una suma acumulativa de varias cifras.
+
+20. Implementa un programa en lenguaje ensamblador que dibuje el bitmap que diseñaste en la pantalla solo si se presiona la tecla “d”:
+
+
