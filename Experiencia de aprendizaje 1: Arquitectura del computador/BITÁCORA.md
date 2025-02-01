@@ -260,6 +260,11 @@ for (int j = 0; j < 10; j++) {
 
 - El código en ensamblador:
 ```
+@100
+D=A
+@arr
+M=D
+
 @0
 M=0
 @1
@@ -280,35 +285,45 @@ M=0
 M=0
 @9
 M=0
+
 @sum
 M=0
 @j
 M=0
+
 (LOOP)
-@j
-D=M
-@10
-D=D-A
-@END
-D;JGE
-@j
-D=M
-@arr
-A=D+A
-D=M
-@sum
-M=M+D
-@j
-M=M+1
-@LOOP
-0;JMP
+    @j
+    D=M
+    @10
+    D=D-A
+    @END
+    D;JGE
+
+    @j
+    D=M
+    @arr
+    A=M
+    A=A+D
+    D=M
+
+    @sum
+    M=M+D
+
+    @j
+    M=M+1
+
+    @LOOP
+    0;JMP
+
 (END)
+    @END
+    0;JMP
 ```
 
-- ¿Qué hace este programa?: Es una suma de diez elementos que se guarda en @sum.
-- ¿Cuál es la dirección base de arr en la memoria RAM?: Comienza en @0.
-- ¿Cuál es la dirección base de sum en la memoria RAM y por qué?: 
-- ¿Cuál es la dirección base de j en la memoria RAM y por qué?
+- ¿Qué hace este programa?: Es una suma de diez elementos del array que se guarda en @sum
+- ¿Cuál es la dirección base de arr en la memoria RAM?: Comienza en @16.
+- ¿Cuál es la dirección base de sum en la memoria RAM y por qué?: @17, por que es el espacio siguiente al guardar los 10 valores del array.
+- ¿Cuál es la dirección base de j en la memoria RAM y por qué?: @18, por que es el espacio siguiente al guardar los 10 valores del sum.
 
 
 
@@ -467,5 +482,144 @@ M=M+1
 - ¿Qué hace este programa?: Parece ser una suma acumulativa de varias cifras.
 
 20. Implementa un programa en lenguaje ensamblador que dibuje el bitmap que diseñaste en la pantalla solo si se presiona la tecla “d”:
+```
+(WHILE)
+@24576
+D = M
 
 
+//if D = 68
+@68
+D = D - A
+@aqui
+D;JNE
+
+@SCREEN
+	D=A
+	@R12
+	AD=D+M
+	M=0
+	
+	D=A 
+	@32
+	AD=D+A
+	M=0
+	
+	D=A 
+	@32
+	AD=D+A
+	@248 
+	D=D+A 
+	A=D-A 
+	M=D-A 
+	
+	D=A 
+	@32
+	AD=D+A
+	@13060 
+	D=D+A 
+	A=D-A 
+	M=D-A 
+
+	D=A 
+	@32
+	AD=D+A
+	@11278 
+	D=D+A 
+	A=D-A 
+	M=D-A
+ 
+	D=A 
+	@32
+	AD=D+A
+	@8216 
+	D=D+A 
+	A=D-A 
+	M=D-A 
+
+	D=A 
+	@32
+	AD=D+A
+	@4484 
+	D=D+A 
+	A=D-A 
+	M=D-A 
+
+	D=A 
+	@32
+	AD=D+A
+	@8770 
+	D=D+A 
+	A=D-A 
+	M=D-A 
+
+	D=A 
+	@32
+	AD=D+A
+	@13473 
+	D=D+A 
+	A=D-A 
+	M=D-A 
+
+	D=A 
+	@32
+	AD=D+A
+	@11439 
+	D=D+A 
+	A=D-A 
+	M=D-A 
+
+	D=A 
+	@32
+	AD=D+A
+	@10408 
+	D=D+A 
+	A=D-A 
+	M=D-A 
+
+	D=A 
+	@32
+	AD=D+A
+	@4166 
+	D=D+A 
+	A=D-A 
+	M=D-A 
+
+	D=A 
+	@32
+	AD=D+A
+	@8194 
+	D=D+A 
+	A=D-A 
+	M=D-A 
+
+	D=A 
+	@32
+	AD=D+A
+	@6154 
+	D=D+A 
+	A=D-A 
+	M=D-A 
+
+	D=A 
+	@32
+	AD=D+A
+	@2038 
+	D=D+A 
+	A=D-A 
+	M=D-A 
+
+	D=A 
+	@32
+	AD=D+A
+	@2 
+	D=D+A 
+	A=D-A 
+	M=D-A 
+	@R13
+	A=M
+	D;JMP
+(aqui)
+@WHILE
+D;JMP
+```
