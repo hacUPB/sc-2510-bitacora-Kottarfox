@@ -1,4 +1,4 @@
-# Investigación
+# Investigación ⁉️
 > [!IMPORTANT]
 > [Página](https://confusion-snapper-025.notion.site/Experiencia-de-aprendizaje-1-Arquitectura-del-computador-17ee8161b2a180dab569d52e21dfeade) de la unidad.
 
@@ -28,7 +28,7 @@ D = A
 M = D      
 ```
 
-### Reto
+### :small_red_triangle: Reto :small_red_triangle:
 1. Carga en D el valor 1978.
 ```
 @1978     
