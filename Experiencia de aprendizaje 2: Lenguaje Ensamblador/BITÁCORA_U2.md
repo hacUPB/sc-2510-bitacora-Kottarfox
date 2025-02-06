@@ -1,6 +1,6 @@
 # Investigación :shrimp:	
 > [!IMPORTANT]
-> [Página]([https://confusion-snapper-025.notion.site/Experiencia-de-aprendizaje-1-Arquitectura-del-computador-17ee8161b2a180dab569d52e21dfeade](https://confusion-snapper-025.notion.site/Experiencia-de-aprendizaje-2-Lenguaje-Ensamblador-17ee8161b2a1809b97e9f4351629ad72)) de la unidad.
+> [Página](https://confusion-snapper-025.notion.site/Experiencia-de-aprendizaje-2-Lenguaje-Ensamblador-17ee8161b2a1809b97e9f4351629ad72) de la unidad.
 
 ### Actividad 1
 - ¿Qué es la entrada-salida mapeada a memoria?
