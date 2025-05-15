@@ -131,8 +131,254 @@ Ser conscientes de la gestión manual de memoria al usar punteros dinámicos.
 Comprender la relación entre clases, objetos y memoria permite construir programas más eficientes y controlados.
 
 ### Reto
+Con todo esto para hice una pequeña definición de todo el proyecto, más bien de lo que va a tener
+- Encapsulamiento para proteger los datos internos de cada partícula.
+- Herencia para crear distintos tipos de partículas que extienden una clase base.
+- Polimorfismo para permitir que cada tipo de partícula se comporte de manera distinta al actualizarse o visualizarse.
 
+#### Reto:
+main.cpp
 
+#include "ofApp.h"
+#include "ofMain.h"
+
+int main() {
+	ofSetupOpenGL(800, 600, OF_WINDOW);
+	ofRunApp(new ofApp());
+}
+
+ofApp.cpp
+
+#include "ofApp.h"
+#include <cmath>
+#include <vector>
+
+// ----------- Particle --------------
+
+Particle::Particle(ofVec2f pos) {
+	position = pos;
+	velocity = ofVec2f(ofRandom(-1, 1), ofRandom(-1, 1));
+	color = ofColor(255, 255, 255, 255);
+	creationTime = ofGetElapsedTimeMillis();
+}
+
+Particle::~Particle() { }
+
+void Particle::update() {
+	position += velocity;
+}
+
+void Particle::draw() {
+	ofSetColor(color.r, color.g, color.b, 255);
+	ofDrawCircle(position, 5);
+}
+
+bool Particle::isDead() const {
+	uint64_t currentTime = ofGetElapsedTimeMillis();
+	return (currentTime - creationTime) > 1500; // 1.5 segundos
+}
+
+// -------- WanderParticle ------------
+
+WanderParticle::WanderParticle(ofVec2f pos)
+	: Particle(pos) {
+	angle = ofRandom(TWO_PI);
+	color = ofColor(255, 50, 50, 255);
+}
+
+void WanderParticle::update() {
+	float wanderStrength = 0.3f;
+	angle += ofRandom(-0.3f, 0.3f);
+	velocity.x = cos(angle) * wanderStrength;
+	velocity.y = sin(angle) * wanderStrength;
+
+	position += velocity;
+}
+
+void WanderParticle::draw(float radius) {
+	ofSetColor(color.r, color.g, color.b, 255);
+	ofDrawCircle(position, radius);
+}
+
+void WanderParticle::draw() {
+	draw(6);
+}
+
+// -------- BackgroundParticle ------------
+
+BackgroundParticle::BackgroundParticle(ofVec2f pos)
+	: Particle(pos) {
+	velocity = ofVec2f(ofRandom(-0.1f, 0.1f), ofRandom(-0.1f, 0.1f));
+
+	std::vector<ofColor> palette = {
+		ofColor(255, 105, 180, 180),
+		ofColor(70, 130, 180, 180),
+		ofColor(60, 179, 113, 180),
+		ofColor(255, 255, 102, 180),
+		ofColor(186, 85, 211, 180)
+	};
+
+	color = palette[(int)ofRandom(palette.size())];
+	creationTime = 0; // para que no mueran por tiempo
+}
+
+void BackgroundParticle::update() {
+	position += velocity;
+
+	if (position.x < 0) position.x = ofGetWidth();
+	if (position.x > ofGetWidth()) position.x = 0;
+	if (position.y < 0) position.y = ofGetHeight();
+	if (position.y > ofGetHeight()) position.y = 0;
+}
+
+void BackgroundParticle::draw() {
+	ofSetColor(color.r, color.g, color.b, color.a);
+	ofDrawCircle(position, 3);
+}
+
+// ----------- ofApp -----------------
+
+void ofApp::setup() {
+	ofBackground(20);
+
+	int numBackground = 100;
+	for (int i = 0; i < numBackground; i++) {
+		float x = ofRandom(ofGetWidth());
+		float y = ofRandom(ofGetHeight());
+		backgroundParticles.push_back(new BackgroundParticle(ofVec2f(x, y)));
+	}
+
+	cursorParticle = new WanderParticle(ofVec2f(ofGetWidth() / 2, ofGetHeight() / 2));
+	cursorVisible = false;
+}
+
+void ofApp::update() {
+	for (auto p : backgroundParticles) {
+		p->update();
+	}
+
+	for (auto it = particles.begin(); it != particles.end();) {
+		(*it)->update();
+		if ((*it)->isDead()) {
+			delete *it;
+			it = particles.erase(it);
+		} else {
+			++it;
+		}
+	}
+
+	if (cursorVisible) {
+		cursorParticle->setPosition(ofVec2f(ofGetMouseX(), ofGetMouseY()));
+		cursorParticle->update();
+
+		particles.push_back(new WanderParticle(cursorParticle->getPosition()));
+	}
+}
+
+void ofApp::draw() {
+	for (auto p : backgroundParticles) {
+		p->draw();
+	}
+
+	for (auto p : particles) {
+		p->draw();
+	}
+
+	if (cursorVisible) {
+		cursorParticle->draw(12);
+	}
+}
+
+void ofApp::mouseMoved(int x, int y) {
+	if (cursorVisible) {
+		cursorParticle->setPosition(ofVec2f(x, y));
+	}
+}
+
+void ofApp::mouseEntered(int x, int y) {
+	cursorVisible = true;
+	cursorParticle->setPosition(ofVec2f(x, y));
+}
+
+void ofApp::mouseExited(int x, int y) {
+	cursorVisible = false;
+}
+
+void ofApp::mousePressed(int x, int y, int button) {
+	// vacío para evitar errores de link
+}
+
+ofApp.h
+
+#pragma once
+
+#include "ofMain.h"
+#include <vector>
+
+// Clase base Particle
+class Particle {
+protected:
+	ofVec2f position;
+	ofVec2f velocity;
+	ofColor color;
+	uint64_t creationTime;
+
+public:
+	Particle(ofVec2f pos);
+	virtual ~Particle();
+
+	virtual void update();
+	virtual void draw();
+	bool isDead() const;
+
+	ofVec2f getPosition() const { return position; }
+	void setPosition(const ofVec2f & pos) { position = pos; }
+};
+
+// Partícula con movimiento errático (cursor y estela)
+class WanderParticle : public Particle {
+private:
+	float angle;
+
+public:
+	WanderParticle(ofVec2f pos);
+
+	void update() override;
+	void draw() override;
+	void draw(float radius);
+};
+
+// Partículas de fondo (más pequeñas y lentas)
+class BackgroundParticle : public Particle {
+public:
+	BackgroundParticle(ofVec2f pos);
+
+	void update() override;
+	void draw() override;
+};
+
+// Clase principal de la aplicación
+class ofApp : public ofBaseApp {
+public:
+	void setup() override;
+	void update() override;
+	void draw() override;
+
+	void mouseMoved(int x, int y) override;
+	void mouseEntered(int x, int y) override;
+	void mouseExited(int x, int y) override;
+
+	void mousePressed(int x, int y, int button) override;
+
+private:
+	std::vector<BackgroundParticle *> backgroundParticles;
+	std::vector<Particle *> particles; // estela del cursor
+
+	WanderParticle * cursorParticle;
+	bool cursorVisible;
+};
+
+Video: https://youtu.be/3v5V6e4HdJY
 
 
 
