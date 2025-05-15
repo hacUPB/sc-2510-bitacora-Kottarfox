@@ -1,1 +1,816 @@
+#### Actividad 1
+
+1. Aquí está lo que me dio ChatGPT y partes que he agregado yo.
+- Entendiendo el programa paso a paso:
+Clases principales:
+  - Clase Node
+     - Representa un nodo de la lista enlazada.
+     - Tiene:
+float x, y: coordenadas del nodo.
+Node* next: puntero al siguiente nodo.
+Constructor: inicializa las coordenadas y pone next en nullptr.
+Destructor: actualmente no hace nada especial, pero puede extenderse.
+
+  - Clase LinkedList
+     - Maneja toda la lista enlazada como una serpiente de nodos.
+     - Miembros:
+Miembros:
+Node* head: inicio de la lista.
+Node* tail: final de la lista.
+int size: número de nodos.
+Constructor: crea un nodo en el centro de la pantalla y lo asigna como cabeza y cola.
+Destructor: llama a clear() para liberar todos los nodos cuando la lista deja de existir.
+
+Métodos:
+clear(): elimina todos los nodos de la lista uno a uno (gestión de memoria).
+addNode(x, y): crea un nuevo nodo al final de la lista.
+update(x, y): mueve el primer nodo a la posición del mouse, y cada nodo subsiguiente a la posición del nodo anterior (tipo efecto serpiente).
+display(): dibuja todos los nodos como círculos rojos.
+
+  - Clase ofApp (controlador principal de openFrameworks)
+snake: una instancia de LinkedList.
+setup(): inicializa el fondo blanco y crea 10 nodos (serpiente de 10 esferas).
+update(): actualiza las posiciones de los nodos basándose en la posición del mouse.
+draw(): dibuja todos los nodos como círculos.
+keyPressed(): si presionas la tecla 'c', limpia toda la lista (y la memoria asociada).
+
+2. Preguntas que me hizo ChatGPT:
+1. ¿Qué ocurre exactamente cuando se llama a addNode() en la lista enlazada?
+R// Se crea un nuevo nodo con new.
+ - Si la lista tiene elementos (tail != nullptr):
+ - El puntero next del nodo actual al final (tail) se actualiza para apuntar al nuevo nodo.
+ - tail se actualiza para que apunte al nuevo nodo (el nuevo final).
+ - Si la lista está vacía (tail == nullptr):
+ - head y tail apuntan ambos al nuevo nodo.
+ - Se incrementa el tamaño de la lista (size++).
+
+¿Qué nodo se modifica?
+R// Se crea un nuevo nodo con new.
+
+¿Cómo cambia el puntero tail?
+R// Si la lista está vacía (tail == nullptr): head y tail apuntan ambos al nuevo nodo.
+
+¿Qué pasa si la lista estaba vacía?
+R// Se incrementa el tamaño de la lista (size++).
+
+2. ¿Qué tipo de puntero es next en la clase Node?
+R// next es un puntero crudo (Node*) que apunta al siguiente nodo en la lista.
+
+¿Qué pasa si no lo inicializas correctamente?
+R// Si usas current->next y no está inicializado, puede provocar fallos en tiempo de ejecución o accesos ilegales a memoria (segfaults)
+
+¿Cómo evita esto un acceso inválido en tiempo de ejecución?
+R// Un puntero no inicializado puede contener basura en memoria.
+
+3. ¿Por qué se usa while (current != nullptr) en clear(), update() y display()?
+R// Esta condición recorre toda la lista desde el nodo head hasta el final, deteniéndose solo cuando current es nullptr, lo que significa que se ha llegado al último nodo.
+
+¿Qué pasaría si usáramos while (current->next != nullptr) en su lugar?
+R// ¿Qué pasaría si usáramos while (current->next != nullptr)?
+Se omitiría el último nodo, ya que current->next será nullptr justo antes del final.
+Esto causaría problemas en:
+- clear(): el último nodo nunca se eliminaría, generando una fuga de memoria.
+- update(): el último nodo nunca actualizaría su posición.
+- display(): el último nodo no se dibujaría.
+
+4. ¿Qué hace exactamente el destructor ~LinkedList() cuando la aplicación termina o se destruye el objeto?:
+R// Llama al método clear(), que libera toda la memoria dinámica reservada para los nodos usando delete.
+
+¿En qué momento se invoca automáticamente?
+R// Se llama automáticamente cuando el objeto snake sale de alcance, por ejemplo, al cerrar el programa o destruir ofApp.
+
+¿Cómo se relaciona con clear()?
+R// Llama al método clear(), que libera toda la memoria dinámica reservada para los nodos usando delete.
+
+4. Una lista enlazada es una estructura de datos en la que cada elemento (nodo) contiene dos partes:
+Un valor (en este caso, las coordenadas x y y).
+Un puntero al siguiente nodo en la secuencia (next).
+una lista enlazada es más flexible en inserciones/eliminaciones, pero más lenta en accesos aleatorios.
+
+Cuadro de diferencias:
+| Característica        | Lista enlazada                                               | Arreglo                                  |
+| --------------------- | ------------------------------------------------------------ | ---------------------------------------- |
+| Almacenamiento        | Los nodos pueden estar en **cualquier lugar** en la memoria  | Elementos están en **bloques contiguos** |
+| Acceso a elementos    | **Secuencial** (hay que recorrer)                            | **Aleatorio** (`arr[i]`) rápido          |
+| Inserción/eliminación | Fácil en cualquier parte (O(1) si se tiene el nodo anterior) | Costosa (O(n) por desplazamientos)       |
+| Tamaño                | Dinámico                                                     | Estático (en arreglos clásicos)          |
+| Eficiencia de memoria | Eficiente para inserciones y borrados                        | Mejor si se accede mucho a índices       |
+
+4. Los nodos están conectados mediante punteros. Cada nodo tiene un puntero llamado next que apunta al siguiente nodo en la lista:
+class Node {
+public:
+    float x, y;
+    Node* next; // Apunta al siguiente nodo
+};
+
+Cuando se agrega un nodo nuevo con addNode, se hace esto:
+tail->next = newNode; // Se enlaza el nodo actual con el nuevo
+tail = newNode;       // Se actualiza tail al nuevo nodo
+Esta estructura permite que la lista "crezca" de manera dinámica, un nodo apuntando al siguiente.
+
+5. Los nodos se crean dinámicamente con new:
+Node* n = new Node(x, y);  // Reserva memoria en el heap
+
+Y se eliminan con delete:
+delete n;  // Libera la memoria ocupada por el nodo
+
+En el código:
+- addNode() usa new para añadir nodos.
+- clear() usa delete para liberar la memoria de cada nodo uno por uno.
+- El destructor ~LinkedList() llama a clear() para evitar fugas de memoria.
+
+6. 
+| Acción            | Lista enlazada                                      | Arreglo clásico                            |
+| ----------------- | --------------------------------------------------- | ------------------------------------------ |
+| **Insertar nodo** | Rápido si se tiene acceso al nodo anterior (`O(1)`) | Lento (`O(n)`) por movimiento de elementos |
+| **Eliminar nodo** | Rápido (`O(1)` con nodo previo)                     | Lento (`O(n)`) por desplazamiento          |
+En una lista enlazada no necesitas mover todos los elementos, solo cambias los punteros.
+
+7. La función clear() recorre todos los nodos y libera la memoria con delete.
+- El destructor ~LinkedList() llama a clear() automáticamente cuando se destruye el objeto.
+- Esto garantiza que todos los nodos se eliminen incluso si el usuario no presiona la tecla 'c'.
+
+LinkedList::~LinkedList() {
+    clear(); // Libera todos los nodos antes de destruir el objeto
+}
+
+8. El código en cuestión:
+
+void LinkedList::clear() {
+    Node* current = head;
+    while (current != nullptr) {
+        Node* nextNode = current->next;
+        delete current;           // Libera el nodo actual
+        current = nextNode;       // Avanza al siguiente nodo
+    }
+    head = nullptr;
+    tail = nullptr;
+    size = 0;
+}
+
+- Se empieza con el primer nodo (head).
+- Se guarda el siguiente nodo (nextNode) antes de eliminar el actual.
+- Se libera el nodo actual (delete current).
+- Se repite el proceso hasta que todos los nodos se han eliminado.
+- Al final, head y tail se ponen en nullptr, y size a 0.
+
+9. Cada vez que se llama a addNode():
+Se crea un nuevo nodo en el heap con new.
+El nodo anterior (tail) apunta al nuevo nodo.
+tail se actualiza para que apunte al nuevo nodo.
+Esto no requiere mover los nodos existentes, a diferencia de un arreglo.
+
+Rendimiento:
+Agregar al final es O(1) gracias al puntero tail.
+Acceder a un nodo específico sigue siendo O(n), ya que hay que recorrer desde el inicio.
+
+10. Aquí vamos a suponer que estamos desarrollando una herramiento de dibujo donde el usuario puede hacer varias cosas como:
+- Agregar puntos (nodos) en cualquier parte del trazo.
+- Eliminar puntos intermedios sin afectar el resto del dibujo.
+
+Ahora por que es mejor usar una lista entrelazada? En pocas palabras es mucho más rápido de esta forma y no se necesita que se muevan los datos, y como no se sabrian las cantidades de puntos que se puedan poner en este programa es más justo.
+En cambio, un arreglo requeriría redimensionarse constantemente, y mover elementos.
+
+11. Imagina una animación generativa donde cada nodo representa una partícula con trayectoria dinámica.
+- Cómo aplicarías el conocimiento:
+Crear una clase ParticleNode que herede de Node, con más propiedades (velocidad, color, etc.).
+Usar punteros inteligentes (std::unique_ptr o std::shared_ptr) para evitar olvidar delete.
+Crear un método clear() para limpiar todas las partículas al cerrar o reiniciar la animación.
+
+- Consideraciones clave:
+Liberar memoria de forma explícita o automática.
+Evitar fugas asegurándote de que todo nodo que creas también se elimina.
+Si puedes usar C++ moderno, prefiere punteros inteligentes sobre new/delete manual.
+
+12. 
+| Aspecto                 | C++                            | C# u otros con GC                               |
+| ----------------------- | ------------------------------ | ----------------------------------------------- |
+| Gestión de memoria      | Manual (`new` / `delete`)      | Automática (garbage collector)                  |
+| Control del programador | Alto control                   | Bajo control (delegado al sistema)              |
+| Riesgo de fugas         | Alto si olvidas liberar        | Bajo (aunque pueden haber memory leaks lógicos) |
+| Predictibilidad         | Más predecible (no hay pausas) | GC puede causar pausas inesperadas              |
+
+- Ventajas de C++:
+Control total sobre cuándo y cómo se libera la memoria.
+Mejor rendimiento en aplicaciones en tiempo real (como videojuegos o simulaciones visuales).
+
+- Desafíos:
+Mayor responsabilidad: si te olvidas de delete, hay fugas.
+Más fácil cometer errores de puntero o acceder a memoria liberada.      
+
+13.
+- Consideraciones:
+Eliminar nodos obsoletos:
+Si una partícula ya no es visible o activa, eliminarla con delete.
+Puedes recorrer la lista y borrar selectivamente.
+
+- Reutilización de nodos:
+Crear un sistema de “pool de objetos” si los nodos se usan frecuentemente (en vez de destruir y crear siempre).
+
+- Destructor correcto:
+Asegúrate de que el destructor de la lista libere todo al cerrar la app.
+
+- Evitar ciclos de punteros:
+Aunque esta lista es simple, si se usa next y prev, evita ciclos que impidan liberar correctamente.
+
+- Pruebas de fugas de memoria:
+Usar herramientas como Valgrind, o el diagnosticador de memoria de Visual Studio.
+
+- Lógica clara de creación y destrucción:
+Cada new debe tener un delete eventual.
+
+14. Pruebas que me dio ChatGPT:
+🔹 addNode(float x, float y)
+Prueba: Llama a addNode() varias veces y verifica que:
+size aumenta correctamente.
+tail cambia.
+Los nodos están bien enlazados (node->next != nullptr).
+📌 Usa breakpoints y observa en el depurador los valores de x, y, next.
+
+🔹 update(float x, float y)
+Prueba:
+Mueve el mouse y observa que el primer nodo sigue al mouse.
+Los nodos posteriores siguen la trayectoria.
+📌 Usa el depurador para ver cómo se propagan las coordenadas (prevX, prevY).
+
+🔹 clear()
+Prueba:
+Presiona 'c' en el teclado.
+Verifica que:
+head y tail son nullptr.
+size == 0.
+No quedan referencias a nodos en memoria (úsalo con herramienta de diagnóstico).
+
+🔹 Destructor de LinkedList
+Prueba:
+Deja que el programa termine y observa que clear() se llama desde ~LinkedList().
+Usa herramientas de memoria para verificar que no hay fugas.
+
+🔹 Funcionalidad completa
+Prueba final:
+Ejecuta la app.
+Observa cómo se forma la "serpiente".
+Presiona 'c' para limpiar.
+Verifica que no haya errores, y que la memoria se libere al salir.
+
+Ahora con las que hice yo, admito que le pedí a ChatGPT que me lo pusiera en una tabla por que se ve bonito.
+| Función         | Resultado esperado                                  | Resultado obtenido        |
+| --------------- | --------------------------------------------------- | ------------------------- |
+| addNode()     | Se añade nodo al final y aumenta el tamaño          | ✅ Funciona correctamente  |
+| update()`     | Nodos siguen al mouse en cadena                     | ✅ Confirmado en pantalla  |
+| clear()       | Elimina todos los nodos, head y tail = nullptr      | ✅ Sin fugas de memoria    |
+| ~LinkedList() | Libera memoria al cerrar                            | ✅ Verificado con debugger |
+| Aplicación    | Se forma una serpiente dinámica y se limpia con 'c' | ✅ Funcional completo      |
+
+
+#### Actividad 2
+1. Entendiendo la aplicación (stack y queue)
+Ambos programas crean círculos que aparecen en pantalla al presionar teclas:
+
+Stack (Pila):
+Cada vez que presionas 'a', se apila un nuevo nodo (círculo) en la parte superior de la pila.
+Cada vez que presionas 'd', se desapila (elimina) el nodo superior.
+La estructura sigue el orden LIFO (Last In, First Out).
+
+Queue (Cola):
+Cada vez que presionas 'a', se encola un nuevo nodo al final de la cola.
+Cada vez que presionas 'd', se desencola el nodo del frente.
+La estructura sigue el orden FIFO (First In, First Out).
+Ambas estructuras usan punteros (Node*) para enlazar los nodos y controlan la memoria dinámicamente con new y delete.
+
+2. Evaluaciones formativas (Stack y Queue)
+ChatGPT dijo: Aquí tienes algunas preguntas con las que puedes autoevaluarte. Usa el depurador de Visual Studio para verificar tus respuestas.
+
+- Stack - Evaluación Formativa
+¿Qué pasa si haces muchas llamadas a push() pero nunca haces pop()?
+¿Qué valor tiene top después de hacer un pop() cuando solo hay un nodo?
+¿Cómo podrías recorrer la pila sin modificarla?
+
+Queue - Evaluación Formativa
+¿Qué pasa con rear después de encolar muchos elementos y desencolar todos?
+¿Qué sucede si haces dequeue() con una cola vacía? ¿Cómo lo manejas?
+¿Cómo se comporta front y rear al insertar el primer nodo?
+
+Verifica en el depurador:
+Pon breakpoints en push(), pop(), enqueue(), dequeue().
+Observa cómo cambian los punteros top, front, rear paso a paso.
+Usa la ventana de variables locales para ver si hay fugas (punteros que no se liberan).
+
+3. Pruebas del programa
+Stack
+Presiona 'a' varias veces y verifica que los círculos se dibujan en el orden correcto (último arriba).
+Presiona 'd' varias veces y asegúrate de que los círculos desaparecen uno por uno desde arriba.
+Haz push() y pop() combinados. Verifica si top apunta al nodo correcto cada vez.
+
+Queue
+Presiona 'a' varias veces y verifica que los círculos se dibujan en orden de llegada.
+Presiona 'd' varias veces y asegúrate de que se elimina siempre el primer círculo agregado.
+Encola muchos elementos, luego desencola todos y asegúrate de que la cola queda vacía (front == nullptr y rear == nullptr).
+
+Ahora las respuestras que hice yo siguiendo un formato de hacer, esperar y como lo puedo hacer que se verifique
+Prueba 1: Apilar elementos con la tecla 'a'
+Qué hacer: Presiona varias veces la tecla 'a' en diferentes lugares de la ventana.
+Qué esperar: Se deben dibujar círculos donde hiciste clic (último al tope).
+Cómo verificar: Usa el depurador para ver que cada vez que haces push(), se crea un nuevo nodo con new.
+Confirma que top apunta al nodo más reciente.
+
+Prueba 2: Desapilar elementos con la tecla 'd'
+Qué hacer: Después de apilar varios nodos, presiona 'd' varias veces.
+Qué esperar: Los círculos deben desaparecer en orden inverso al que fueron agregados (LIFO).
+Cómo verificar:Confirma en el depurador que delete se llama y top se actualiza. Si haces más pop() de los nodos existentes, no debería crashear.
+
+Prueba 3: Validar liberación de memoria
+Qué hacer: Apila muchos nodos (por ejemplo 1000), luego presiona 'd' hasta vaciar la pila.
+Qué esperar: No debe haber fugas de memoria si todos los delete se ejecutan correctamente.
+Herramienta opcional: Usa un profiler como Valgrind (en Linux) o Visual Studio Diagnostic Tools para confirmar.
+
+Prueba 4: Destructor y clear()
+Qué hacer: Cierra la aplicación con nodos en la pila.
+Qué esperar: El destructor de Stack debe llamar a clear(), y todos los nodos deben eliminarse.
+Cómo verificar: Usa puntos de interrupción en el destructor y clear().
+
+Pruebas para la Queue (Cola)
+Prueba 1: Encolar elementos con 'a'
+Qué hacer: Presiona 'a' varias veces en distintos lugares.
+Qué esperar: Se dibujan círculos de izquierda a derecha en orden de llegada.
+Cómo verificar:El depurador debe mostrar cómo rear->next se actualiza con cada nuevo nodo.front debe mantenerse fijo hasta que se desencole.
+
+Prueba 2: Desencolar con 'd'
+Qué hacer: Después de encolar varios elementos, presiona 'd'.
+Qué esperar: Los círculos desaparecen en el orden en que fueron encolados (FIFO).
+Cómo verificar:Verifica que front cambia y delete se llama.Cuando se borra el último nodo, front y rear deben volver a nullptr.
+
+Prueba 3: Verificar que rear y front se comportan correctamente
+Qué hacer: Encola un solo nodo y luego desencólalo.
+Qué esperar: Tanto front como rear deben volver a nullptr.
+Cómo verificar: Revisa estos valores en el depurador.
+
+Prueba 4: Verificar que clear() en el destructor funciona
+Qué hacer: Agrega nodos, luego cierra la aplicación.
+Qué esperar: clear() debe llamar a dequeue() repetidamente hasta liberar todos los nodos.
+
+Prueba final de comportamiento completo
+¿Funciona la visualización?
+Sí, display() recorre la estructura y dibuja los círculos. El orden dependerá de si es stack (último al tope) o queue (primero al frente). Verifica que los círculos desaparezcan correctamente al eliminar nodos.
+
+¿Hay fugas de memoria?
+Si todo está bien implementado (como en tu código), no deberían haber fugas, pero siempre es buena idea usar herramientas como: Valgrind (Linux), Visual Studio Diagnostic Tools (Windows), Instruments (Mac)
+
+Autoevaluación:
+1. ¿Puedo explicar detalladamente cómo funciona el proceso de apilar y desapilar nodos en un stack, incluyendo la gestión de memoria?
+Sí. Al apilar (push), se crea un nuevo nodo en el heap con new. Este nodo apunta al nodo que antes estaba en la cima (top), y top se actualiza para apuntar al nuevo nodo.
+Al desapilar (pop), se elimina el nodo que está en top usando delete, y se actualiza top al siguiente nodo. Así se evita una fuga de memoria.
+
+2. ¿Soy capaz de identificar y corregir una fuga de memoria en una implementación de stack manual?
+Sí. Una fuga ocurriría si no se hace delete en los nodos eliminados. Este código evita eso correctamente con delete en pop() y con clear() en el destructor. Si se presentara un error, revisaría si pop() realmente borra el nodo antes de perder la referencia a él.
+
+3. ¿Puedo modificar el stack para que incluya una función que busque un elemento específico, sin alterar el orden de los elementos apilados?
+Sí. Podría hacer una función como bool find(float x, float y) que recorra la pila sin modificarla:
+
+bool Stack::find(float x, float y) {
+    Node* current = top;
+    while (current != nullptr) {
+        if (current->position.x == x && current->position.y == y) {
+            return true;
+        }
+        current = current->next;
+    }
+    return false;
+}
+
+Esto no altera el orden porque solo se recorre con un puntero temporal.
+
+4. ¿Entiendo cómo la estructura LIFO del stack afecta el flujo de datos y puedo dar ejemplos de problemas que se resuelvan mejor con un stack?
+Sí. LIFO (Last In, First Out) significa que el último elemento que entra es el primero que sale. Es ideal para problemas como:
+Deshacer acciones (última acción se revierte primero).
+Recorrido en profundidad (DFS).
+Evaluación de expresiones matemáticas en notación postfija.
+
+5. ¿Puedo implementar y depurar un stack para tipos de datos más complejos, asegurándome de que no haya fugas de memoria ni errores de puntero?
+Sí. Solo habría que modificar la clase Node para incluir un objeto más complejo, asegurarse de copiarlo correctamente en el constructor, y liberar memoria si se usan punteros internos dentro de ese objeto. También se pueden usar shared_ptr para simplificar.
+
+- Autoevaluación 
+1. ¿Puedo explicar claramente el proceso de encolar y desencolar nodos en una queue, incluyendo la gestión de memoria?
+Sí. Al encolar (enqueue), se crea un nodo con new, se enlaza al final (rear->next = newNode) y se actualiza rear. Si es el primer nodo, también se actualiza front.
+Al desencolar (dequeue), se elimina el nodo de front usando delete, y se actualiza front. Si la cola queda vacía, rear también se pone en nullptr.
+
+2. ¿Soy capaz de identificar y corregir problemas relacionados con la gestión de los punteros front y rear en una queue?
+Sí. Los errores comunes incluyen:
+No actualizar rear cuando front se vuelve nullptr.
+Dejar nodos sin eliminar.
+No enlazar bien el nuevo nodo al rear.
+En mi código, estos casos se manejan correctamente y los verifiqué usando el depurador.
+
+3. ¿Puedo modificar la queue para implementar una queue circular, entendiendo cómo esto afectaría la gestión de memoria?
+Sí. En una queue circular, el último nodo apunta al primero (rear->next = front), permitiendo reutilizar nodos o hacer estructuras más eficientes sin moverse en memoria constantemente. Requiere manejar con cuidado la condición de cola llena (en caso de usar tamaño fijo).
+
+4. ¿Entiendo cómo la estructura FIFO de una queue afecta el flujo de datos y puedo dar ejemplos de problemas que se resuelvan mejor con una queue?
+Sí. FIFO (First In, First Out) significa que el primer elemento en entrar es el primero en salir. Es útil en:
+Sistemas de impresión.
+Simulación de colas (banco, supermercado).
+Recorrido por niveles (BFS en grafos).
+Control de tareas pendientes.
+
+5. ¿Puedo implementar y depurar una queue para tipos de datos más complejos, asegurándome de que no haya fugas de memoria ni errores de puntero?
+Sí. Igual que con el stack, se debe gestionar bien la construcción y destrucción de los objetos complejos dentro de los nodos. Usar shared_ptr o unique_ptr también puede ayudar a evitar fugas y simplificar la gestión de memoria.
+
+- Reflexión
+1. En una implementación manual de una cola, la memoria se gestiona dinámicamente con new y delete. Cada vez que se encola un nuevo nodo (enqueue), se reserva memoria en el heap con new. Al desencolar (dequeue), se elimina explícitamente ese nodo con delete.
+Es crucial tener un destructor (~Queue) que libere todos los nodos restantes, llamando a clear(), para evitar fugas de memoria. Este manejo manual ofrece control total, pero también implica mayor riesgo de errores, como olvidarse de liberar memoria o manipular incorrectamente los punteros.
+
+2.La cola requiere mantener dos punteros activos: front (inicio) y rear (final). Esto introduce algunos desafíos adicionales:
+Se debe actualizar correctamente front y rear cuando se encolan o desencolan elementos.
+Si se desencola el último elemento, rear también debe ponerse en nullptr para evitar que apunte a memoria inválida.
+Si se olvida actualizar alguno de estos punteros, se puede perder acceso a los nodos, provocando fugas de memoria o dangling pointers.
+En contraste, en un stack solo se gestiona el puntero top, lo que simplifica la lógica.
+
+3. La estructura FIFO garantiza que el primer elemento que entra es el primero que sale. Esto refleja cómo funcionan muchas situaciones del mundo real: colas en tiendas, procesos en sistemas operativos, tareas en servidores.
+La FIFO es esencial en:
+Simulación de sistemas de espera.
+Control de tareas o eventos en orden cronológico.
+Algoritmos como Breadth-First Search (BFS) en grafos.
+Permite mantener un flujo ordenado y justo, especialmente cuando el orden de llegada es importante.
+
+4.Una queue circular conecta el último nodo al primero (rear->next = front), formando un bucle. Esto tiene varias ventajas:
+Reutilización eficiente del espacio: en lugar de mover elementos o hacer shift, se puede sobrescribir nodos anteriores si ya han sido usados.
+Menor fragmentación de memoria en estructuras de tamaño fijo (como en buffers).
+Puede reducir la necesidad de asignaciones y liberaciones constantes de memoria.
+Para implementarla, habría que ajustar la condición de finalización y manipular los punteros front y rear para que recorran el ciclo sin sobrescribir nodos no procesados.
+
+5. Los errores más comunes incluyen:
+Fugas de memoria: si dequeue() no hace delete o se pierde la referencia al nodo.
+Punteros colgantes: si rear sigue apuntando a un nodo ya eliminado.
+Acceso a memoria inválida: si se intenta acceder a front o rear cuando la cola está vacía.
+
+Para evitarlos:
+Siempre verificar si front == nullptr antes de acceder.
+Al desencolar el último nodo, asegurarse de poner también rear = nullptr.
+Inicializar ambos punteros en el constructor (nullptr).
+Usar funciones como clear() en el destructor para limpiar toda la memoria.
+
+- Autoevaluación 
+1. Sí. En el proceso de encolar (enqueue), se crea un nuevo nodo con new, y si la cola está vacía (rear == nullptr), tanto front como rear apuntan a este nuevo nodo. Si no está vacía, el nuevo nodo se enlaza al final (rear->next = newNode) y luego rear se actualiza.
+En el proceso de desencolar (dequeue), se guarda el nodo en una variable temporal, se actualiza front = front->next, y luego se elimina el nodo con delete. Si después de desencolar la cola queda vacía (front == nullptr), también se pone rear = nullptr.
+Este manejo manual requiere atención para evitar errores como pérdidas de memoria o punteros colgantes.
+
+2. Sí. Puedo reconocer que:
+Si rear no se pone en nullptr cuando la cola se vacía, se puede tener un puntero inválido.
+Si se pierde la referencia al nodo actual antes de hacer delete, se produce una fuga de memoria.
+Si no se actualiza rear correctamente al encolar, el nuevo nodo no se conecta correctamente.
+Estas situaciones pueden corregirse agregando condiciones claras en dequeue() y enqueue() para actualizar los punteros según el estado de la cola. También puedo utilizar el depurador para observar el comportamiento de front y rear en tiempo real.
+
+3. Sí. Para implementar una queue circular, haría que el último nodo (rear) apunte al primero (front). Esto requiere:
+Cambiar el comportamiento de enqueue() para que rear->next = front.
+Modificar la lógica de dequeue() para actualizar correctamente front y, si la cola se vacía, romper el ciclo (rear = nullptr).
+Tener cuidado de no recorrer infinitamente la estructura si se usa en bucles (do while).
+El mayor impacto es que ya no se puede usar nullptr como señal de final, por lo que se requiere una condición alternativa para detectar que se ha completado una vuelta. Este tipo de estructura es útil en buffers circulares y simulaciones de recursos finitos.
+
+4. Sí. La estructura FIFO (First In, First Out) permite que el primer elemento insertado sea el primero en salir, lo que la hace ideal para:
+Sistemas de impresión (impresora procesa tareas en orden de llegada).
+Simulación de filas o turnos (como en bancos, supermercados).
+Gestión de procesos en sistemas operativos.
+Algoritmos como Breadth-First Search (BFS), donde se exploran nodos en capas.
+A diferencia de un stack (LIFO), la queue garantiza equidad temporal y procesamiento en orden cronológico.
+
+5. Sí. Para implementar una queue con datos más complejos (por ejemplo, una clase Persona con nombre, edad, etc.), puedo:
+Modificar el nodo para contener un objeto o puntero al objeto.
+Si se usa un puntero (Persona*), asegurarme de liberar la memoria en el destructor del nodo.
+En el destructor de la cola, llamar a delete de cada nodo y su contenido si es dinámico.
+Utilizar el depurador o herramientas como Visual Leak Detector o Valgrind (en Linux) para verificar que no haya fugas de memoria.
+También podría usar shared_ptr o unique_ptr si se permite usar C++ moderno, lo que facilita la gestión de memoria.
+
+- RETO -
+- Exploración creativa: Remolino de esferas de color (ooohhh)
+Visualiza un remolino de esferas de colores que giran alrededor del centro de la pantalla. Las esferas nuevas se apilan desde el centro hacia afuera (estructura: pila). Una lista enlazada mantiene la velocidad de rotación y color de cada esfera. Puedes interactuar con el teclado para agregar o quitar esferas, y el movimiento se acelera o desacelera con las flechas.
+
+1. Combinación de estructuras de datos
+Pila: Guarda las posiciones radiales de las esferas que se van apilando desde el centro hacia afuera. Cada vez que se agrega una esfera, se "push" a la pila la posición.
+Lista enlazada: Controla atributos dinámicos de cada esfera, como el color y la velocidad individual de rotación. Esta lista enlazada se maneja manualmente, sin STL.
+Gestión dinámica: Ambas estructuras crean y destruyen nodos usando new y delete para gestión explícita de memoria.
+
+2. Interactividad
+Teclas para interactuar:
+'a': agrega una nueva esfera (apilándola).
+'d': elimina la última esfera (desapilando).
+Flechas arriba y abajo para aumentar o disminuir la velocidad de rotación general.
+La interacción cambia el comportamiento y la visualización del remolino en tiempo real, generando dinamismo.
+
+3. Gestión de memoria
+Cada nodo de la pila y lista enlazada se elimina correctamente usando delete cuando desaparece un nodo.
+En el destructor de cada estructura se limpia toda la memoria dinámica.
+No se usan punteros "colgantes" o sin liberar, evitando fugas.
+
+4. Otros detalles importantes
+Se usa movimiento dinámico: la rotación de cada esfera se actualiza en update().
+Visualización gráfica de las esferas con colores variables.
+Estructuras de datos explícitas, sin STL, para evidenciar comprensión profunda.
+
+Ahora el moridero, el código: 
+Para ofApp.h
+
+#pragma once
+#include "ofMain.h"
+
+// Nodo para la lista enlazada (atributos de cada esfera)
+class SphereNode {
+public:
+    ofColor color;
+    float rotationSpeed;
+    SphereNode* next;
+
+    SphereNode(ofColor c, float speed) {
+        color = c;
+        rotationSpeed = speed;
+        next = nullptr;
+    }
+};
+
+// Lista enlazada para controlar atributos dinámicos de las esferas
+class SphereList {
+public:
+    SphereNode* head;
+
+    SphereList() {
+        head = nullptr;
+    }
+
+    ~SphereList() {
+        clear();
+    }
+
+    void add(ofColor c, float speed) {
+        SphereNode* newNode = new SphereNode(c, speed);
+        newNode->next = head;
+        head = newNode;
+    }
+
+    void removeLast() {
+        if (!head) return;
+        if (!head->next) {
+            delete head;
+            head = nullptr;
+            return;
+        }
+        SphereNode* current = head;
+        while (current->next && current->next->next) {
+            current = current->next;
+        }
+        delete current->next;
+        current->next = nullptr;
+    }
+
+    void clear() {
+        while (head) {
+            SphereNode* temp = head;
+            head = head->next;
+            delete temp;
+        }
+    }
+};
+
+// Nodo para la pila (posición radial)
+class PositionNode {
+public:
+    float radius;
+    PositionNode* next;
+
+    PositionNode(float r) {
+        radius = r;
+        next = nullptr;
+    }
+};
+
+// Pila para almacenar posiciones radiales de esferas
+class PositionStack {
+public:
+    PositionNode* top;
+
+    PositionStack() {
+        top = nullptr;
+    }
+
+    ~PositionStack() {
+        clear();
+    }
+
+    void push(float r) {
+        PositionNode* newNode = new PositionNode(r);
+        newNode->next = top;
+        top = newNode;
+    }
+
+    void pop() {
+        if (top != nullptr) {
+            PositionNode* temp = top;
+            top = top->next;
+            delete temp;
+        }
+    }
+
+    void clear() {
+        while (top != nullptr) {
+            pop();
+        }
+    }
+};
+
+class ofApp : public ofBaseApp {
+public:
+    PositionStack posStack;    // Posiciones radiales de esferas
+    SphereList sphereList;     // Atributos (color, velocidad)
+
+    float baseRotation;        // Ángulo base de rotación global
+    float rotationSpeed;       // Velocidad de rotación global
+
+    void setup();
+    void update();
+    void draw();
+    void keyPressed(int key);
+
+private:
+    void drawSpheres();
+};
+
+
+- ofApp.cpp
+
+#include "ofApp.h"
+
+//--------------------------------------------------------------
+void ofApp::setup() {
+	ofSetBackgroundColor(30);
+	baseRotation = 0;
+	rotationSpeed = 0.02f;
+}
+
+//--------------------------------------------------------------
+void ofApp::update() {
+	baseRotation += rotationSpeed;
+}
+
+//--------------------------------------------------------------
+void ofApp::draw() {
+	ofTranslate(ofGetWidth() / 2, ofGetHeight() / 2); // Centro pantalla
+	drawSpheres();
+}
+
+// Dibuja todas las esferas, combinando posiciones de pila y atributos de lista
+void ofApp::drawSpheres() {
+	PositionNode * posNode = posStack.top;
+	SphereNode * sphereNode = sphereList.head;
+
+	int index = 0;
+	while (posNode != nullptr && sphereNode != nullptr) {
+		float angle = baseRotation * (index + 1); // Ángulo con rotación
+		float x = posNode->radius * cos(angle);
+		float y = posNode->radius * sin(angle);
+
+		ofSetColor(sphereNode->color);
+		float radius = 15 + 5 * sin(ofGetElapsedTimef() * sphereNode->rotationSpeed); // Tamaño dinámico
+
+		ofDrawCircle(x, y, radius);
+
+		posNode = posNode->next;
+		sphereNode = sphereNode->next;
+		index++;
+	}
+}
+
+//--------------------------------------------------------------
+void ofApp::keyPressed(int key) {
+	if (key == 'a') {
+		// Agregar esfera: nueva posición radial y atributos (color y velocidad aleatorios)
+		float newRadius = posStack.top ? (40 + posStack.top->radius + 20) : 40;
+
+		posStack.push(newRadius);
+
+		ofColor newColor = ofColor::fromHsb(ofRandom(0, 255), 200, 255);
+		float newSpeed = ofRandom(0.5, 2.0);
+		sphereList.add(newColor, newSpeed);
+	} else if (key == 'd') {
+		// Eliminar última esfera: desapilar y eliminar nodo atributo
+		posStack.pop();
+		sphereList.removeLast();
+	} else if (key == OF_KEY_UP) {
+		// Incrementar velocidad rotación global
+		rotationSpeed += 0.01f;
+	} else if (key == OF_KEY_DOWN) {
+		// Disminuir velocidad rotación global (mínimo 0)
+		rotationSpeed = max(0.f, rotationSpeed - 0.01f);
+	}
+}
+
+y Main.cpp
+
+#include "ofApp.h"
+#include "ofMain.h"
+
+//========================================================================
+int main() {
+	ofSetupOpenGL(1024, 768, OF_WINDOW); // Ventana de 1024x768
+	ofRunApp(new ofApp()); // Lanza la app principal
+}
+
+(comentarios gracias ChatGpt)
+
+RAE1:
+- Se usó una pila (PositionStack) para controlar la posición radial de cada esfera desde el centro hacia afuera, permitiendo que el último agregado sea el más externo.
+- Se usó una lista enlazada (SphereList) para guardar atributos visuales y de movimiento de cada esfera (color y velocidad de oscilación).
+- El método drawSpheres() itera simultáneamente en ambas estructuras para dibujar cada esfera en la posición correspondiente con sus propiedades.
+- La interacción con el usuario agrega y elimina esferas, además de cambiar la velocidad de rotación global.
+- La gestión de memoria es manual, liberando los nodos correctamente al eliminar elementos o al destruir las estructuras.
+- Esto evidencia el cumplimiento del RAE1: construcción de aplicación interactiva con patrones y estructuras de datos combinadas y gestión explícita de memoria.
+
+RAE2 (Con ayuda de ChatGPT para las preguntas)
+
+- Prueba de agregado y eliminación de esferas:
+Presiona 'a' varias veces y verifica que las esferas aparecen correctamente y se dibujan con colores y movimientos distintos.
+Presiona 'd' para eliminar y observa que desaparecen sin errores o fugas.
+Usa el depurador para verificar que los nodos se crean y destruyen correctamente.
+
+- Prueba de velocidad:
+Usa flechas arriba y abajo para acelerar o desacelerar la rotación.
+Asegura que la velocidad no sea negativa y que la rotación se comporte como se espera.
+Prueba de gestión de memoria:
+Cierra la aplicación con varias esferas y revisa con herramientas o el depurador que no haya fugas de memoria.
+Verifica que el destructor de las estructuras libera todos los nodos.
+
+- Capturas de pantalla:
+Muestra varias esferas girando con diferentes colores.
+Muestra cambios con la interacción (agregar, eliminar, cambiar velocidad).
+
+Ahora las respuestas:
+Prueba de creación y eliminación de esferas
+Procedimiento:
+Presionar repetidamente la tecla 'a' para agregar esferas.
+Observar que cada esfera aparece en pantalla con color y tamaño dinámico.
+Presionar la tecla 'd' para eliminar esferas una por una.
+Confirmar que las esferas desaparecen en orden inverso al agregado (LIFO de pila).
+
+Resultado esperado:
+Cada esfera nueva se agrega con posición radial incrementada.
+Al eliminar, la última esfera agregada desaparece primero.
+No ocurren errores ni bloqueos al agregar o eliminar.
+
+Evidencia:
+Captura de pantalla con varias esferas en pantalla.
+Captura mostrando la reducción de esferas tras presionar 'd'.
+
+2. Prueba de interacción con la velocidad de rotación
+Procedimiento:
+Presionar tecla flecha arriba para aumentar la velocidad de rotación global.
+Presionar tecla flecha abajo para disminuir la velocidad (hasta 0).
+Observar el cambio visual en la velocidad de giro de todas las esferas.
+
+Resultado esperado:
+La velocidad no debe ser negativa.
+La aplicación responde sin retrasos ni saltos bruscos.
+
+Evidencia:
+Captura mostrando las esferas girando lento.
+Captura mostrando esferas girando rápido tras aumentar velocidad.
+
+3. Prueba de gestión y liberación de memoria
+Procedimiento:
+Utilizar un profiler o herramienta de detección de fugas de memoria (como Valgrind o herramientas integradas en IDEs).
+Ejecutar la aplicación agregando y eliminando muchas esferas.
+Cerrar la aplicación y verificar que no queden fugas.
+
+Resultado esperado:
+No se detectan fugas de memoria.
+Los destructores de lista y pila liberan todos los nodos correctamente.
+
+Evidencia:
+Captura o reporte del profiler mostrando cero fugas.
+Captura de consola al cerrar la aplicación sin errores.
+
+4. Prueba de comportamiento integrado
+Procedimiento:
+Combinar las interacciones: agregar, eliminar esferas y cambiar la velocidad de rotación en diferentes momentos.
+Observar que no se producen fallos o comportamientos inesperados.
+Confirmar que la experiencia visual es fluida y coherente.
+
+Resultado esperado:
+La aplicación mantiene estabilidad y fluidez.
+Las estructuras de datos sincronizan correctamente el estado.
+No hay crashes ni errores gráficos.
+
+Evidencia:
+Capturas de pantalla con distintas configuraciones y estados.
+Video corto mostrando la interacción completa.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
