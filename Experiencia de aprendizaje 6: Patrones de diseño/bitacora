@@ -1,1 +1,118 @@
+#### Reto
+
+- main.cpp
+
+#include "ofMain.h"
+#include "ofApp.h"
+
+int main() {
+    ofSetupOpenGL(1024, 768, OF_WINDOW);
+    ofRunApp(new ofApp());
+}
+
+- ofApp.h
+
+#pragma once
+#include "ofMain.h"
+
+class ofApp : public ofBaseApp {
+public:
+    void setup();
+    void update();
+    void draw();
+    void keyPressed(int key);
+
+private:
+    enum SceneState { CALM, ENERGETIC };
+    SceneState currentState;
+
+    struct Shape {
+        ofVec2f pos;
+        float radius;
+        ofColor color;
+        float speed;
+        bool isParticle;
+    };
+
+    std::vector<Shape> shapes;
+
+    void changeState(SceneState newState);
+    void addShape(std::string type); // Simula Factory
+};
+
+
+ofMain.cpp
+
+#include "ofApp.h"
+
+void ofApp::setup() {
+    ofSetFrameRate(60);
+    ofBackground(0);
+    currentState = CALM;
+}
+
+void ofApp::update() {
+    for (auto& s : shapes) {
+        if (s.isParticle) {
+            s.pos += ofVec2f(ofRandom(-2, 2), ofRandom(-2, 2));
+        } else {
+            s.radius += sin(ofGetElapsedTimef() * s.speed) * 0.5;
+        }
+    }
+}
+
+void ofApp::draw() {
+    // Simula State Pattern: Fondo depende del estado
+    if (currentState == CALM) {
+        ofBackgroundGradient(ofColor(20, 20, 80), ofColor(0, 0, 0));
+    } else if (currentState == ENERGETIC) {
+        ofBackgroundGradient(ofColor::red, ofColor::black);
+    }
+
+    for (auto& s : shapes) {
+        ofSetColor(s.color);
+        ofDrawCircle(s.pos, s.radius);
+    }
+
+    // Instrucciones
+    ofSetColor(255);
+    ofDrawBitmapString("Presiona '1' para CALM - '2' para ENERGETIC", 20, 20);
+    ofDrawBitmapString("Presiona 'c' para agregar CIRCLE", 20, 40);
+    ofDrawBitmapString("Presiona 'p' para agregar PARTICLE", 20, 60);
+}
+
+void ofApp::keyPressed(int key) {
+    if (key == '1') {
+        changeState(CALM);
+    } else if (key == '2') {
+        changeState(ENERGETIC);
+    } else if (key == 'c') {
+        addShape("circle");
+    } else if (key == 'p') {
+        addShape("particle");
+    }
+}
+
+// Simula State Pattern
+void ofApp::changeState(SceneState newState) {
+    currentState = newState;
+}
+
+// Simula Factory Pattern
+void ofApp::addShape(std::string type) {
+    Shape s;
+    s.pos.set(ofRandomWidth(), ofRandomHeight());
+    s.color.setHsb(ofRandom(255), 200, 255);
+    s.radius = (type == "circle") ? ofRandom(20, 60) : 5;
+    s.speed = ofRandom(0.5, 2.0);
+    s.isParticle = (type == "particle");
+    shapes.push_back(s);
+}
+
+
+Teclas usadas:        
+1  Cambia al estado CALM  
+2  Cambia al estado ENERGETIC
+c  Agrega una figura circular     
+p  Agrega una partícula           
 
