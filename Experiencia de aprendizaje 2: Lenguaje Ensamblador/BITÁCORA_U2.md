@@ -901,4 +901,157 @@ Al final:
 > RAM[17] == 16 (p apunta correctamente a a)
 Esta bien el puntero :D
 
+6. Ahora vas a usar un puntero para leer la posición de memoria a la que este apunta, es decir, vas a leer por medio del puntero la variable cuya dirección está almacenada en él.
+```
+int a = 10;
+int *p;
+p = &a;
+*p = 20;
+```
+
+En nand2tetris:
+```
+// a = 10
+@10
+D=A
+@a
+M=D
+
+// p = &a (es decir, p = 16)
+@a
+D=A
+@p
+M=D
+
+// *p = 20 (es decir, RAM[RAM[17]] = 20)
+@20
+D=A
+@p
+A=M
+M=D
+```
+
+7. Traduce este programa a lenguaje ensamblador:
+```
+int a = 10;
+int b = 5;
+int *p;
+p = &a;
+b = *p;
+```
+En hack:
+```
+// a = 10
+@10
+D=A
+@a
+M=D
+
+// b = 5
+@5
+D=A
+@b
+M=D
+
+// p = &a
+@a
+D=A
+@p
+M=D
+
+// b = *p → leer desde dirección a través de p
+@p
+A=M    // A = RAM[18] = dirección de a
+D=M    // D = RAM[a] = 10
+@b
+M=D    // b = 10
+
+```
+
+
+
+8. Vas a parar un momento y tratarás de recodar de memoria lo siguiente. Luego verifica con un compañero o con el profesor.
+    - ¿Qué hace esto `int *pvar;`?
+    - ¿Qué hace esto `pvar = var;`?
+    - ¿Qué hace esto `var2 = *pvar`?
+    - ¿Qué hace esto `pvar = &var3`?
+
+ R// 
+ | Código en C++   | ¿Qué hace?                                                                                                   |
+| --------------- | ------------------------------------------------------------------------------------------------------------ |
+| `int *pvar;`    | Declara un puntero a entero. `pvar` puede almacenar la dirección de una variable tipo `int`.                 |
+| `pvar = var;`   | Asigna a `pvar` el **valor de var**, no su dirección. (Incorrecto para punteros si var no es una dirección). |
+| `var2 = *pvar;` | Asigna a `var2` el **valor contenido en la dirección apuntada por `pvar`**.                                  |
+| `pvar = &var3;` | Asigna a `pvar` la **dirección de memoria de `var3`**. Correcta forma de asignar direcciones.                |
+
+
+
+
+9. Considera que el punto de entrada del siguiente programa es la función main, es decir, el programa inicia llamando la función main. Vas a proponer una posible traducción a lenguaje ensamblador de la función suma, cómo llamar a suma y cómo regresara std::cout << "El valor de c es: " << c << std::endl; una vez suma termine.
+
+```
+int suma(int a, int b) {
+   int var = a + b;
+   return var;
+}
+
+int main() {
+   int c = suma(6, 9);
+   std::cout << "El valor de c es: " << c << std::endl;
+   return 0;
+}
+```
+En  hack:
+```
+// Simula int a = 6
+@6
+D=A
+@a
+M=D
+
+// Simula int b = 9
+@9
+D=A
+@b
+M=D
+
+// var = a + b
+@a
+D=M
+@b
+D=D+M
+@var
+M=D
+
+// c = var
+@var
+D=M
+@c
+M=D
+
+// Bucle infinito (detener ejecución)
+(END)
+@END
+0;JMP
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
