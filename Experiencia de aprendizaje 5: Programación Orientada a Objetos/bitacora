@@ -1,0 +1,393 @@
+#### Actividad 1
+- ¿Qué representa la clase Particle?
+La clase Particle representa un modelo o plantilla para crear partículas que tienen una posición en un plano 2D, definida por las coordenadas x y y. También define el comportamiento de esas partículas mediante el método move, que permite modificar su posición.
+
+- ¿Cómo interactúan sus atributos y métodos?
+Los atributos x y y almacenan el estado actual (la posición) de la partícula. El método move(float dx, float dy) modifica ese estado sumando dx a x y dy a y. Es decir, el método lee y escribe directamente los atributos del objeto que lo llama.
+
+- Con el propmt para ChatGPT, Esto me dio:
+Un objeto en C++ es una instancia concreta de una clase. La clase actúa como una plantilla que define qué datos (atributos) y comportamientos (métodos) tendrá cada objeto.
+Usando el ejemplo:
+
+class Particle {
+public:
+    float x, y;
+    void move(float dx, float dy) {
+        x += dx;
+        y += dy;
+    }
+};
+
+Cuando escribes: Particle p1;
+Estás creando un objeto p1 que tiene su propio espacio en memoria para x y y, y que puede usar el método move para cambiar esos valores.
+p1.x = 10; p1.y = 20; inicializa su posición.
+p1.move(5, -3); cambia la posición de p1 a (15, 17).
+
+Resumen de la relación:
+La clase define qué es y qué puede hacer una partícula.
+El objeto es una instancia viva de esa definición, con sus propios datos y la capacidad de ejecutar los métodos definidos en la clase.
+
+- ¿Los atributos están contiguos?
+Sí, normalmente los atributos de un objeto están almacenados de forma contigua en memoria. Al imprimir:
+std::cout << &(p1.x) << std::endl;
+std::cout << &(p1.y) << std::endl;
+Verás que la dirección de p1.y es 4 bytes después de la de p1.x (si cada float ocupa 4 bytes). Esto refleja que los atributos están organizados uno tras otro, en el orden en que fueron declarados en la clase.
+
+- ¿Qué indica el tamaño del objeto sobre su estructura interna?
+El resultado de sizeof(Particle) te dice cuántos bytes ocupa un objeto Particle. En este caso será 8 bytes (dos float). Esto confirma que:
+- No hay métodos almacenados dentro del objeto (los métodos son compartidos, no copiados por objeto).
+- No hay herencia ni miembros virtuales (lo cual podría agregar punteros internos y aumentar el tamaño).
+
+- Respuesta de ChatGPT:
+- ¿Cómo se almacenan los objetos en memoria en C++?
+En C++, cuando creas un objeto como Particle p1;, el compilador reserva un bloque continuo de memoria suficiente para almacenar todos los atributos del objeto. En el caso de la clase Particle, que tiene dos float, cada objeto ocupará típicamente 8 bytes (4 bytes por cada float, aunque puede variar según la arquitectura y alineación del sistema).
+
+- Si tengo dos instancias de Particle, ¿cómo se relacionan sus direcciones de memoria?
+Particle p1;
+Particle p2;
+
+Cada instancia (p1, p2) ocupa su propio espacio en memoria. Cuando imprimes sus direcciones con:
+std::cout << &p1 << std::endl;
+std::cout << &p2 << std::endl;
+Verás que las direcciones son distintas y separadas por al menos el tamaño del objeto (sizeof(Particle)). Esto significa que cada objeto vive en su propio espacio en memoria, y no hay relación directa entre ellos más allá de compartir el mismo tipo.
+
+- ¿Cómo afectan los datos estáticos al tamaño de la instancia?
+Los datos estáticos no afectan el tamaño de una instancia.
+Esto se debe a que las variables estáticas pertenecen a la clase, no al objeto. Solo hay una copia en toda la ejecución del programa, compartida entre todas las instancias.
+
+- ¿Qué diferencias hay entre datos estáticos y dinámicos en términos de memoria? 
+| Característica                            | Datos estáticos                          | Datos dinámicos                                         |
+| ----------------------------------------- | ---------------------------------------- | ------------------------------------------------------- |
+| ¿Se comparte entre objetos?               | Sí, una sola copia por clase             | No, cada objeto puede tener su propio bloque de memoria |
+| ¿Dónde se almacenan?                      | En el **segmento estático** del programa | En el **heap** (memoria dinámica)                       |
+| ¿Afecta el tamaño del objeto (`sizeof`) ? | **No**                                   | Solo el **puntero** cuenta, no los datos apuntados      |
+| ¿Cómo se gestionan?                       | Automáticamente (una sola vez)           | Manualmente con `new` y `delete`                        |
+
+- Lo que me dio ChatGPT:
+En C++, el tamaño de una instancia de clase (sizeof) depende solo de los miembros no estáticos que contiene.
+
+-Variables estáticas:
+class StaticData {
+public:
+    static int s; // variable estática
+    int a;
+};
+
+s es compartida por todas las instancias de la clase.
+Se almacena en una zona de memoria separada (segmento estático del programa), no dentro del objeto.
+No afecta el tamaño del objeto. Solo a cuenta para sizeof(StaticData).
+
+- Variables dinámicas:
+
+class DynamicData {
+public:
+    int* ptr; // puntero, no el arreglo
+    DynamicData() {
+        ptr = new int[10];
+    }
+    ~DynamicData() {
+        delete[] ptr;
+    }
+};
+
+ptr es un puntero que ocupa 4 u 8 bytes (dependiendo de la arquitectura).
+Lo que apunta (new int[10]) vive en el heap, y no se incluye en el sizeof del objeto.
+Tú controlas manualmente esa memoria con new y delete.
+
+- ¿Las variables estáticas ocupan espacio en cada objeto?
+No. Las variables estáticas no se almacenan dentro de cada objeto, sino que existen una sola vez, compartidas por todas las instancias. Por eso, no afectan el tamaño reportado por sizeof.
+
+| Característica             | Estáticos                 | Dinámicos                          |
+| -------------------------- | ------------------------- | ---------------------------------- |
+| Se comparten entre objetos | Sí                        | No                                 |
+| Afectan `sizeof`           | No                        | Solo el puntero, no los datos      |
+| Lugar en memoria           | Segmento estático         | Heap (memoria dinámica)            |
+| Gestión de memoria         | Automática por el sistema | Manual (requiere `new` / `delete`) |
+
+Reflexión
+- Qué es un objeto desde la perspectiva de la memoria?
+Un objeto en C++ es una estructura en memoria que contiene todos los datos definidos por su clase (los atributos no estáticos). Cuando se crea una instancia de una clase, el sistema reserva un bloque de memoria para almacenar esos datos.
+Cada objeto tiene su propio espacio en memoria, independiente de otros objetos, y su dirección puede obtenerse con el operador &.
+
+- ¿Cómo influyen los atributos y métodos en el tamaño y estructura del objeto?
+Atributos no estáticos:
+Se almacenan dentro del objeto y afectan directamente su tamaño. El orden de declaración define cómo se organizan en memoria (generalmente de forma contigua).
+
+Atributos estáticos:
+No se almacenan dentro del objeto. Viven en una región separada de memoria y no afectan el tamaño de la instancia.
+
+Métodos:
+No ocupan espacio dentro del objeto. Se compilan una sola vez y se comparten entre todas las instancias. Solo afectan el tamaño del objeto si hay métodos virtuales, ya que eso implica un puntero adicional interno (tabla virtual).
+
+Atributos dinámicos (punteros):
+Solo el puntero vive dentro del objeto. La memoria a la que apunta está en el heap, y no cuenta en el sizeof.
+
+- Los objetos en C++ son estructuras concretas en memoria que contienen solo sus datos (atributos no estáticos). 
+El tamaño de un objeto depende exclusivamente de estos atributos.
+Diseñar clases con cuidado en la elección de atributos es clave para optimizar el uso de memoria, especialmente en sistemas con recursos limitados.
+Evitar atributos innecesarios.
+Usar variables estáticas cuando no se requiere una copia por instancia.
+Ser conscientes de la gestión manual de memoria al usar punteros dinámicos.
+Comprender la relación entre clases, objetos y memoria permite construir programas más eficientes y controlados.
+
+### Reto
+Con todo esto para hice una pequeña definición de todo el proyecto, más bien de lo que va a tener
+- Encapsulamiento para proteger los datos internos de cada partícula.
+- Herencia para crear distintos tipos de partículas que extienden una clase base.
+- Polimorfismo para permitir que cada tipo de partícula se comporte de manera distinta al actualizarse o visualizarse.
+
+#### Reto:
+main.cpp
+
+#include "ofApp.h"
+#include "ofMain.h"
+
+int main() {
+	ofSetupOpenGL(800, 600, OF_WINDOW);
+	ofRunApp(new ofApp());
+}
+
+ofApp.cpp
+
+#include "ofApp.h"
+#include <cmath>
+#include <vector>
+
+// ----------- Particle --------------
+
+Particle::Particle(ofVec2f pos) {
+	position = pos;
+	velocity = ofVec2f(ofRandom(-1, 1), ofRandom(-1, 1));
+	color = ofColor(255, 255, 255, 255);
+	creationTime = ofGetElapsedTimeMillis();
+}
+
+Particle::~Particle() { }
+
+void Particle::update() {
+	position += velocity;
+}
+
+void Particle::draw() {
+	ofSetColor(color.r, color.g, color.b, 255);
+	ofDrawCircle(position, 5);
+}
+
+bool Particle::isDead() const {
+	uint64_t currentTime = ofGetElapsedTimeMillis();
+	return (currentTime - creationTime) > 1500; // 1.5 segundos
+}
+
+// -------- WanderParticle ------------
+
+WanderParticle::WanderParticle(ofVec2f pos)
+	: Particle(pos) {
+	angle = ofRandom(TWO_PI);
+	color = ofColor(255, 50, 50, 255);
+}
+
+void WanderParticle::update() {
+	float wanderStrength = 0.3f;
+	angle += ofRandom(-0.3f, 0.3f);
+	velocity.x = cos(angle) * wanderStrength;
+	velocity.y = sin(angle) * wanderStrength;
+
+	position += velocity;
+}
+
+void WanderParticle::draw(float radius) {
+	ofSetColor(color.r, color.g, color.b, 255);
+	ofDrawCircle(position, radius);
+}
+
+void WanderParticle::draw() {
+	draw(6);
+}
+
+// -------- BackgroundParticle ------------
+
+BackgroundParticle::BackgroundParticle(ofVec2f pos)
+	: Particle(pos) {
+	velocity = ofVec2f(ofRandom(-0.1f, 0.1f), ofRandom(-0.1f, 0.1f));
+
+	std::vector<ofColor> palette = {
+		ofColor(255, 105, 180, 180),
+		ofColor(70, 130, 180, 180),
+		ofColor(60, 179, 113, 180),
+		ofColor(255, 255, 102, 180),
+		ofColor(186, 85, 211, 180)
+	};
+
+	color = palette[(int)ofRandom(palette.size())];
+	creationTime = 0; // para que no mueran por tiempo
+}
+
+void BackgroundParticle::update() {
+	position += velocity;
+
+	if (position.x < 0) position.x = ofGetWidth();
+	if (position.x > ofGetWidth()) position.x = 0;
+	if (position.y < 0) position.y = ofGetHeight();
+	if (position.y > ofGetHeight()) position.y = 0;
+}
+
+void BackgroundParticle::draw() {
+	ofSetColor(color.r, color.g, color.b, color.a);
+	ofDrawCircle(position, 3);
+}
+
+// ----------- ofApp -----------------
+
+void ofApp::setup() {
+	ofBackground(20);
+
+	int numBackground = 100;
+	for (int i = 0; i < numBackground; i++) {
+		float x = ofRandom(ofGetWidth());
+		float y = ofRandom(ofGetHeight());
+		backgroundParticles.push_back(new BackgroundParticle(ofVec2f(x, y)));
+	}
+
+	cursorParticle = new WanderParticle(ofVec2f(ofGetWidth() / 2, ofGetHeight() / 2));
+	cursorVisible = false;
+}
+
+void ofApp::update() {
+	for (auto p : backgroundParticles) {
+		p->update();
+	}
+
+	for (auto it = particles.begin(); it != particles.end();) {
+		(*it)->update();
+		if ((*it)->isDead()) {
+			delete *it;
+			it = particles.erase(it);
+		} else {
+			++it;
+		}
+	}
+
+	if (cursorVisible) {
+		cursorParticle->setPosition(ofVec2f(ofGetMouseX(), ofGetMouseY()));
+		cursorParticle->update();
+
+		particles.push_back(new WanderParticle(cursorParticle->getPosition()));
+	}
+}
+
+void ofApp::draw() {
+	for (auto p : backgroundParticles) {
+		p->draw();
+	}
+
+	for (auto p : particles) {
+		p->draw();
+	}
+
+	if (cursorVisible) {
+		cursorParticle->draw(12);
+	}
+}
+
+void ofApp::mouseMoved(int x, int y) {
+	if (cursorVisible) {
+		cursorParticle->setPosition(ofVec2f(x, y));
+	}
+}
+
+void ofApp::mouseEntered(int x, int y) {
+	cursorVisible = true;
+	cursorParticle->setPosition(ofVec2f(x, y));
+}
+
+void ofApp::mouseExited(int x, int y) {
+	cursorVisible = false;
+}
+
+void ofApp::mousePressed(int x, int y, int button) {
+	// vacío para evitar errores de link
+}
+
+ofApp.h
+
+#pragma once
+
+#include "ofMain.h"
+#include <vector>
+
+// Clase base Particle
+class Particle {
+protected:
+	ofVec2f position;
+	ofVec2f velocity;
+	ofColor color;
+	uint64_t creationTime;
+
+public:
+	Particle(ofVec2f pos);
+	virtual ~Particle();
+
+	virtual void update();
+	virtual void draw();
+	bool isDead() const;
+
+	ofVec2f getPosition() const { return position; }
+	void setPosition(const ofVec2f & pos) { position = pos; }
+};
+
+// Partícula con movimiento errático (cursor y estela)
+class WanderParticle : public Particle {
+private:
+	float angle;
+
+public:
+	WanderParticle(ofVec2f pos);
+
+	void update() override;
+	void draw() override;
+	void draw(float radius);
+};
+
+// Partículas de fondo (más pequeñas y lentas)
+class BackgroundParticle : public Particle {
+public:
+	BackgroundParticle(ofVec2f pos);
+
+	void update() override;
+	void draw() override;
+};
+
+// Clase principal de la aplicación
+class ofApp : public ofBaseApp {
+public:
+	void setup() override;
+	void update() override;
+	void draw() override;
+
+	void mouseMoved(int x, int y) override;
+	void mouseEntered(int x, int y) override;
+	void mouseExited(int x, int y) override;
+
+	void mousePressed(int x, int y, int button) override;
+
+private:
+	std::vector<BackgroundParticle *> backgroundParticles;
+	std::vector<Particle *> particles; // estela del cursor
+
+	WanderParticle * cursorParticle;
+	bool cursorVisible;
+};
+
+Video: https://youtu.be/3v5V6e4HdJY
+
+
+
+
+
+
+
+
+
+
+
+
